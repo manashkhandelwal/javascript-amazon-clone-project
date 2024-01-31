@@ -1,4 +1,4 @@
-import {cart, removeFromCart} from '../data/add-to-cart.js';
+import {cart, removeFromCart, updateDeliveryOption} from '../data/add-to-cart.js';
 import {products} from '../data/products.js';
 import { formatCurrency } from './utils/money.js';
 import { deliveryOptions } from '../data/deliveryOptions.js';
@@ -14,11 +14,11 @@ cart.forEach((cartItem)=> {
           matchingProduct=product;
       }
   });
-  const deliveryOptionId = cart.Item.deliveryOptionId;
+  const deliveryOptionId = cartItem.deliveryOptionId;
 
   let deliveryOption;
 
-  deliveryOption.forEach((option) => {
+  deliveryOptions.forEach((option) => {
     if (option.id === deliveryOptionId){
       deliveryOption = option;
     }
@@ -74,7 +74,7 @@ cartSummaryHTML += `
   `;
 });
 
-function deliveryOptionsHTML(matchingProduct){
+function deliveryOptionsHTML(matchingProduct, cartItem){
   let html = '';
   deliveryOptions.forEach((deliveryOption) =>{
     const today=dayjs();
@@ -92,7 +92,7 @@ function deliveryOptionsHTML(matchingProduct){
 
 
     html += `
-      <div class="delivery-option">
+      <div class="delivery-option js-delivery-option" data-product-id="${matchingProduct.id}" data-delivery-option-id="${deliveryOption.id}">
         <input type="radio"
           ${isChecked ? 'checked' : ''}
           class="delivery-option-input"
@@ -122,3 +122,9 @@ document.querySelectorAll('.js-delete-link').forEach((link)=>{
     container.remove();
   })
 })
+document.querySelectorAll('.js-delivery-option').forEach((element)=>{
+  element.addEventListener('click',()=>{
+    const {productId, deliveryOptionId} = element.dataset;
+    updateDeliveryOption(productId, deliveryOptionId);
+  });
+});
